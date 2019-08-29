@@ -38,6 +38,7 @@
             - [线程池有什么用，为什么要使用线程池](#线程池有什么用为什么要使用线程池)
             - [ThreadLocal](#threadlocal)
         - [1.7 锁](#17-锁)
+            - [Java中的锁有几种](#java中的锁有几种)
             - [乐观锁和悲观锁](#乐观锁和悲观锁)
             - [`Synchronized` `ReentrantLock`区别](#synchronized-reentrantlock区别)
             - [`volatile`的作用及适用场景](#volatile的作用及适用场景)
@@ -840,6 +841,16 @@ https://www.jianshu.com/p/98b68c97df9b
     ```
 
 ### 1.7 锁
+#### Java中的锁有几种
+1. `synchronized`关键字
+2. `java.util.concurrent.locks`包下常用的类
+    1. `ReentrantLock`：可重入锁，实现了`Lock`接口，并且提供了更多的方法
+    2. `ReentrantReadWriteLock`：可重入的读写锁，实现了`ReadWriteLock`接口，最主要的有两个方法：`readLock()`和`writeLock()`用来获取读锁和写锁
+    3. `StampedLock`：JDK8新增，该锁提供了三种模式的读写控制
+        1. 写锁writeLock，是个排它锁或者叫独占锁
+        2. 悲观读锁readLock，是个共享锁
+        3. 乐观读锁tryOptimisticRead（在操作数据前并没有通过CAS设置锁的状态）
+
 #### 乐观锁和悲观锁
 1. 悲观锁
     1. 总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁（共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程）
