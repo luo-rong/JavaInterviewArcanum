@@ -3,6 +3,9 @@
 # 面试秘籍
 ## 1 Java
 ### 1.1 语言特性
+#### 对面向对象的理解
+面向过程的范式重点在于设计方法。面向对象的范式将数据和方法耦合在一起构成对象。使用面向对象范式的软件设计重点在对象以及对对象的操作上
+
 #### Java语言的特性，和其他语言的区别
 1. 一次编写，处处运行。不管是C语言还是C++，用它们编写的代码编译成的机器码都是只作用某一个特定的运行环境，当换一个环境或换一个CPU的时候原来的代码要有很大的变动才能正常运行。Java语言可以在不改变代码的情况下在不同的运行环境下正常运行，因为java代码编译的时候并不是编译成机器代码，而是字节码这种中间代码，通过JVM把字节码边运行边解释成适合的机器码，保证了正常运行
 2. 安全性、多线程、动态等等优秀的特点
@@ -357,11 +360,7 @@ HashMap | | | 有，`MAXIMUM_CAPACITY = 1<<30` | 自动扩增/2倍 | 不安全 |
         1. 红黑树：添加节点
         2. 链表：在尾部插入
 
-#### 如何让HashMap线程安全
-1. `HashTable`的方式：将容器中数据进行操作的方法用`synchronized`关键字修饰
-2. `ConcurrentHashMap`的方式：采用分段锁思路，`segment`+`HashEntry`（JDK1.7）
-
-#### `HashMap` `CurrentHashMap` `LinkedHashMap` `HashTable`区别
+#### `HashMap` `ConcurrentHashMap` `LinkedHashMap` `HashTable`的区别
 接口`java.util.Map`，Map主要用于存储健值对，根据键得到值，因此不允许键重复（重复则覆盖），但允许值重复
 1. Hashmap
     
@@ -394,6 +393,10 @@ HashMap | | | 有，`MAXIMUM_CAPACITY = 1<<30` | 自动扩增/2倍 | 不安全 |
     不允许key/value为空，`Concurrenthashmap`线程安全
     1. JDK1.7中采用`Segment`+`HashEntry`实现，lock加在`Segment`上
     2. JDK1.8中采用`Node`+`CAS`+`Synchronized`实现
+
+#### 如何让`HashMap`线程安全 | `HashTable`、`ConcurrentHashmap`如何实现线程安全
+1. `HashTable`的方式：将容器中数据进行操作的方法用`synchronized`关键字修饰
+2. `ConcurrentHashMap`的方式：采用分段锁思路，`segment`+`HashEntry`（JDK1.7）；`Node`+`CAS`+`Synchronized`（JDK1.8）
 
 #### `CurrentHashMap`实现线程安全的关键（JDK1.7 分段锁）
 [ConcurrentHashMap实现原理及源码分析](https://www.cnblogs.com/chengxiao/p/6842045.html)
@@ -457,8 +460,24 @@ JDK1.7中采用`Segment`+`HashEntry`实现，lock加在`Segment`上。`Segment`�
 #### 线程安全怎么理解
 当多个线程访问某个方法时，不管你通过怎样的调用方式或者说这些线程如何交替的执行，我们在主程序中不需要去做任何的同步，这个类的结果行为都是我们设想的正确行为，那么我们就可以说这个类是线程安全的
 
-#### 实现多线程有几种实现方式
-https://www.cnblogs.com/felixzh/p/6036074.html
+#### 如何创建一个线程
+[https://www.cnblogs.com/songshu120/p/7966314.html](https://www.cnblogs.com/songshu120/p/7966314.html)
+1. 继承`Thread`类创建线程类
+    1. 定义`Thread`类的子类，并重写该类的`run()`方法，该`run()`方法的方法体就代表了线程要完成的任务，因此把`run()`方法称为执行体
+    2. 创建`Thread`子类的实例，即创建了线程对象
+    3. 调用线程对象的`start()`方法来启动该线程
+2. 通过`Runnable`接口创建线程类：线程的执行流程很简单，当执行代码`start()`时，就会执行对象中重写的`run()`方法，该方法执行完成后，线程就消亡了
+    1. 定义`Runnable`接口的实现类，并重写该接口的`run()`方法，该`run()`方法的方法体同样是该线程的线程执行体
+    2. 创建`Runnable`实现类的实例，并以此实例作为`Thread`的`target`来创建`Thread`对象，该`Thread`对象才是真正的线程对象
+    3. 调用线程对象的`start()`方法来启动该线程
+3. 通过`Callable`和`Future`创建线程
+    1. 创建`Callable`接口的实现类，并实现`call()`方法，该`call()`方法将作为线程执行体，并且有返回值
+    2. 创建`Callable`实现类的实例，使用`FutureTask`类来包装`Callable`对象，该`FutureTask`对象封装了该`Callable`对象的`call()`方法的返回值（`FutureTask`是一个包装器，它通过接受`Callable`来创建，它同时实现了`Future`和`Runnable`接口）
+    3. 使用`FutureTask`对象作为`Thread`对象的`target`创建并启动新线程
+    4. 调用`FutureTask`对象的`get()`方法来获得子线程执行结束后的返回值
+
+#### ==实现多线程有几种实现方式==
+[JAVA多线程实现的四种方式](https://www.cnblogs.com/felixzh/p/6036074.html)
 
 Java多线程实现方式主要有四种：继承Thread类、实现Runnable接口、实现Callable接口通过FutureTask包装器来创建Thread线程、使用ExecutorService、Callable、Future实现有返回结果的多线程。
 
@@ -1217,7 +1236,6 @@ https://www.cnblogs.com/wslook/p/9185448.html
     3. 幻读：Phantom Read，是指当事务不是独立执行时发生的一种现象，例如第一个事务对一个表中的数据进行了修改，这种修改涉及到表中的全部数据行。同时，第二个事务也修改这个表中的数据，这种修改是向表中插入一行新数据。那么，以后就会发生操作第一个事务的用户发现表中还有没有修改的数据行，就好象发生了幻觉一样
 
 ### 6.2 索引
-
 #### MySQL索引类别
 [MySQL索引类型](https://www.cnblogs.com/luyucheng/p/6289714.html)
 
@@ -1238,6 +1256,12 @@ CREATE TABLE table_name[col_name data type]
 4. 组合索引：指多个字段上创建的索引，只有在查询条件中使用了创建索引时的第一个字段，索引才会被使用。使用组合索引时遵循最左前缀集合
 5. 全文索引：主要用来查找文本中的关键字，而不是直接与索引中的值相比较
     > `fulltext`索引跟其它索引不同，它更像是一个搜索引擎。`fulltext`索引配合`match against`操作使用，而不是一般的`where`语句加`like`。它可以在`create table`，`alter table`，`create index`使用，不过目前只有`char` `varchar` `text` 列上可以创建全文索引。在数据量较大时候，先将数据放入一个没有全局索引的表中，然后再用`CREATE index`创建`fulltext`索引，要比先为一张表建立`fulltext`然后再将数据写入的速度快很多
+
+#### 索引的作用
+1. 快速取数据（大大加快数据的检索速度）
+2. 保证数据记录的唯一性（创建唯一性索引，保证数据库表中每一行数据的唯一性）
+3. 实现表与表之间的参照完整性（加速表和表之间的连接）
+4. 在使用`ORDER BY` `GROUP BY`子句进行数据检索时，利用索引可以减少排序和分组的时间（在使用分组和排序子句进行数据检索时，可以显著减少查询中分组和排序的时间）
 
 #### 索引数据结构，为什么用B+树而不是而不是B树，两者有什么区别
 https://blog.csdn.net/u013411246/article/details/81088914
@@ -1575,6 +1599,9 @@ TCP为它的应用程序提供了流量控制服务以消除发送方使接收�
 ---
 ## 9 数据结构 算法
 ### 9.1 数据结构
+#### 了解的数据结构
+![image](https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=1da695bc58b5c9ea76fe0bb1b450dd65/71cf3bc79f3df8dcf83d2c26ce11728b47102800.jpg)
+
 #### 红黑树插入元素的过程（变色）
 [红黑树 性质及操作 维基百科](https://wikipedia.hk.wjbk.site/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91)
 
@@ -1636,6 +1663,17 @@ O(lgn) = O(log_2n)
     它与暴力的区别在于暴力枚举了“使用的硬币”，然而这属于冗余信息。要求出f(15)，只需要知道f(14),f(10),f(4)的值。其他信息并不需要。舍弃了冗余信息。我们只记录了对解决问题有帮助的信息——f(n).　　
     
     我们能这样干，取决于问题的性质：求出f(n)，只需要知道几个更小的f(c)。我们将求解f(c)称作求解f(n)的“子问题”。这就是DP（动态规划，dynamic programming）
+
+#### 栈的最大值问题
+可以修改栈的存储方式，push，pop的操作
+1. 方法1：时间复杂度`O(1)`，空间复杂度`O(n)`。一个数据栈`Sn`，一个最大值栈`Sm`
+    1. `push()`方法：将元素`push`入数据栈`Sn`；当`push`入栈的元素大于/等于当前最大值栈`Sm`的栈顶元素时，将该元素`push`入最大值栈`Sm`
+    2. `pop()`方法：将数据栈`Sn`栈顶元素`pop`出栈`Sn`；当`pop`出栈的元素等于最大值栈`Sm`的栈顶元素时，将最大值栈`Sm`栈顶元素`pop`出栈
+    3. 最大值：`Sm`栈顶始终保存当前栈中的最大元素
+2. 方法2：若能提前读入所有元素/所有元素均为非负数，则可使用本方法。时间复杂度`O(1)`，空间复杂度`O(1)`。一个数据栈`Sn`，一个最大值`max`（若可提前读入元素，则`max`的初始值为最小元素）
+    1. `push()`方法：将`当前元素-max`的值`push`入栈。若当前元素大于等于`max`，将`max`的值替换为当前元素
+    2. `pop()`方法：`pop`出栈顶元素。若栈顶元素为负数，则当前值为`栈顶元素+max`；若栈中元素为非负数，则当前值为`max`，并将`max`替换为`max-栈顶元素`
+    3. 最大值：`max`始终保存当前栈中的最大元素
 
 ---
 ## 10 Linux
