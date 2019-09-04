@@ -1154,6 +1154,12 @@ Spring最成功的是其提出的理念，而不是技术本身。它所依赖�
     1. 静态代理是指使用AOP框架提供的命令进行编译，从而在编译阶段就可生成AOP代理类，因此也称为编译时增强（AspectJ）
     2. 动态代理则在运行时借助于JDK动态代理、CGLIB等在内存中“临时”生成AOP动态代理类，因此也被称为运行时增强（Spring AOP）
 
+#### AOP的使用场景
+[AOP的应用场景(异常处理、安全检查和缓存)](https://blog.csdn.net/lzufeng/article/details/89816281)
+1. 异常处理
+2. 安全检查
+3. 缓存
+
 #### Spring bean生命周期
 https://www.cnblogs.com/V1haoge/p/6106456.html
 
