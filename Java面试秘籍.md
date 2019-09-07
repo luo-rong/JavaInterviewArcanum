@@ -1156,6 +1156,8 @@ Spring最成功的是其提出的理念，而不是技术本身。它所依赖�
 
 #### AOP的使用场景
 [AOP的应用场景(异常处理、安全检查和缓存)](https://blog.csdn.net/lzufeng/article/details/89816281)
+
+[Principle of Spring AOP Implementation](https://programmer.help/blogs/principle-of-spring-aop-implementation.html)
 1. 异常处理
 2. 安全检查
 3. 缓存
